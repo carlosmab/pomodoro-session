@@ -1,0 +1,44 @@
+{
+  "name": "pomodoro-session",
+  "displayName": "Pomodoro Session",
+  "description": "A VSCode extension to manage Pomodoro sessions, set timers, and block distractions.",
+  "version": "0.0.1",
+  "publisher": "your-name",
+  "engines": {
+    "vscode": "^1.98.2"
+  },
+  "categories": [
+    "Productivity"
+  ],
+  "activationEvents": [
+    "onCommand:pomodoro.start",
+    "onCommand:pomodoro.internalStartTimer"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pomodoro.start",
+        "title": "Start Pomodoro Session"
+      },
+      {
+        "command": "pomodoro.internalStartTimer",
+        "title": "Start Timer Internally"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/extension.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/vscode": "^1.99.1",
+    "typescript": "^5.8.3",
+    "vscode": "^1.1.37",
+    "vscode-test": "^1.6.1"
+  }
+}
