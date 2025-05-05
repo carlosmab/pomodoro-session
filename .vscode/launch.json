@@ -1,0 +1,5 @@
+{
+    "outFiles": [
+      "${workspaceFolder}/dist/**/*.js"
+    ],
+}

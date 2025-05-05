@@ -1,61 +1,117 @@
 import * as vscode from 'vscode';
-import { PomodoroTimer } from './timerStatus';
+import { PomodoroSession } from './pomodoroSession';
 import { SetupPanel } from './setupPanel';
 import { showBlockingNotification } from './notifications';
 
-let statusBarItem: vscode.StatusBarItem;
-let stopButton: vscode.StatusBarItem;
-let timer: PomodoroTimer;
+let timerStatus: vscode.StatusBarItem;
+let startButton: vscode.StatusBarItem;
 
+let pomodoroSession: PomodoroSession;
 
 export function activate(context: vscode.ExtensionContext) {
-  statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-  stopButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 90);  // For Stop button
-  timer = new PomodoroTimer();
+    console.log('Pomodoro Timer extension is now active!');
 
-  // Show the stop button and hide it when timer ends
-  stopButton.command = 'pomodoro.stop';  // Register stop command
+    timerStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+    startButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand('pomodoro.start', () => {
-      SetupPanel.createOrShow(context.extensionUri);
-    })
-  );
+    context.subscriptions.push(timerStatus, startButton);
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand('pomodoro.stop', () => {
-      stopPomodoroTimer();  // Call the stop function
-    })
-  );
+    pomodoroSession = new PomodoroSession();
 
-  vscode.window.registerWebviewPanelSerializer('pomodoroSetup', {
-    async deserializeWebviewPanel(panel: vscode.WebviewPanel, state: any) {
-      SetupPanel.revive(panel, context.extensionUri);
+    timerStatus.command = 'pomodoro.showMenu';
+    startButton.command = 'pomodoro.start';
+    startButton.text = 'Start Pomodoro';
+    startButton.tooltip = 'Start Pomodoro Timer';
+    startButton.show();
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('pomodoro.setup', () => {
+            SetupPanel.createOrShow(context.extensionUri);
+        }),
+        vscode.commands.registerCommand('pomodoro.start', () => {
+            startPomodoroSession();
+        }),
+        vscode.commands.registerCommand('pomodoro.showMenu', async () => {
+            const selection = await vscode.window.showQuickPick([
+                'Pause',
+                'Resume',
+                'Stop',
+                'Restart',
+                'Setup',
+            ], { placeHolder: 'Pomodoro Options' });
+        
+            switch (selection) {
+                case 'Pause':
+                    pomodoroSession.pause();
+                    break;
+                case 'Resume':
+                    pomodoroSession.resume();
+                    break;
+                case 'Stop':
+                    await stopPomodoroSession();
+                    break;
+                case 'Restart':
+                    await restartPomodoroSession();
+                    break;
+                case 'Setup':
+                    SetupPanel.createOrShow(context.extensionUri);
+                    break;
+            }
+        })
+    );
+
+    pomodoroSession.onTick((min, sec) => {
+        timerStatus.text = pomodoroSession.getCurrentTimerText();
+        startButton.hide();
+        timerStatus.show();
+    });
+
+    pomodoroSession.onEnd((message) => {
+        if (message) {
+            showBlockingNotification(message);
+        }
+    });
+
+    pomodoroSession.onStop(() => {
+        timerStatus.hide();
+        startButton.show();
+        vscode.window.showInformationMessage('Pomodoro session stopped.');
+    });
+}
+
+function startPomodoroSession() {
+    const workMinutes = vscode.workspace.getConfiguration('pomodoro').get('workDuration', 25); 
+    const shortBreakMinutes = vscode.workspace.getConfiguration('pomodoro').get('shortBreakDuration', 5);
+    const longBreakMinutes = vscode.workspace.getConfiguration('pomodoro').get('longBreakDuration', 15);
+
+    pomodoroSession.start(workMinutes, shortBreakMinutes, longBreakMinutes);
+    timerStatus.text = `⏱️ Starting Pomodoro...`;
+    startButton.hide();
+}
+
+async function stopPomodoroSession() {
+    const confirmation = await vscode.window.showInformationMessage(
+        'Are you sure you want to stop the Pomodoro timer?',
+        'Yes', 'No'
+    );
+
+    if (confirmation === 'Yes') {
+        pomodoroSession.stop();
+        vscode.window.showInformationMessage('Pomodoro timer stopped.');
+        timerStatus.hide();
+        startButton.show();
     }
-  });
-
-  // Timer callbacks
-  timer.onTick((min, sec) => {
-    statusBarItem.text = `⏱️ ${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-    statusBarItem.show();
-    stopButton.show();  // Show stop button when timer is running
-  });
-
-  timer.onEnd(() => {
-    statusBarItem.hide();
-    stopButton.hide();  // Hide stop button when timer ends
-    showBlockingNotification();
-  });
 }
 
-export function startPomodoroWithSettings(work: number) {
-  timer.start(work);
+async function restartPomodoroSession() {
+    const confirmation = await vscode.window.showInformationMessage(
+        'Are you sure you want restart the Pomodoro Session?',
+        'Yes', 'No'
+    );
+
+    if (confirmation === 'Yes') {
+        pomodoroSession.restartSession();
+        vscode.window.showInformationMessage('Pomodoro Session restarted.');
+    }
 }
 
-// New function to stop the Pomodoro timer
-function stopPomodoroTimer() {
-  timer.stop();
-  statusBarItem.hide();
-  stopButton.hide();
-  vscode.window.showInformationMessage('Pomodoro timer stopped.');
-}

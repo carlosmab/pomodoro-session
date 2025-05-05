@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 
-export function showBlockingNotification() {
+export function showBlockingNotification(message: string) {
   vscode.window.showErrorMessage(
-    '⏰ Pomodoro ended! Take a break!',
+    message,
     { modal: true },
     'OK'
   );
