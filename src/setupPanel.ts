@@ -77,10 +77,10 @@ export class SetupPanel {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
                     body {
-                        font-family: 'Arial', sans-serif;
+                        font-family: var(--vscode-font-family, 'Arial', sans-serif);
                         padding: 20px;
-                        background-color: #f4f7fc;
-                        color: #333;
+                        background-color: var(--vscode-editor-background);
+                        color: var(--vscode-editor-foreground);
                         display: flex;
                         flex-direction: column;
                         align-items: center;
@@ -88,61 +88,64 @@ export class SetupPanel {
                         height: 100vh;
                         margin: 0;
                     }
-    
+
                     h2 {
-                        color: rgb(163, 55, 73);
+                        color: var(--vscode-titleBar-activeForeground);
                         margin-bottom: 20px;
                         font-size: 24px;
                     }
-    
+
                     label {
                         font-size: 16px;
                         margin-bottom: 8px;
                         display: block;
-                        color: #555;
+                        color: var(--vscode-editor-foreground);
                         font-weight: 600;
                     }
-    
+
                     input {
                         padding: 8px;
                         font-size: 16px;
                         width: 60%;
                         margin-bottom: 15px;
-                        border: 2px solid #ddd;
+                        border: 1px solid var(--vscode-input-border, #555);
+                        background-color: var(--vscode-input-background);
+                        color: var(--vscode-input-foreground);
                         text-align: right;
                         border-radius: 4px;
                         transition: border-color 0.3s;
                     }
-    
+
                     input:focus {
-                        border-color:rgb(163, 55, 73);
+                        border-color: var(--vscode-focusBorder);
                         outline: none;
                     }
-    
+
                     button {
                         padding: 10px 20px;
                         font-size: 16px;
-                        background-color: rgb(163, 55, 73);
-                        color: white;
+                        background-color: var(--vscode-button-background);
+                        color: var(--vscode-button-foreground);
                         border: none;
                         border-radius: 4px;
                         cursor: pointer;
                         transition: background-color 0.3s;
                     }
-    
+
                     button:hover {
-                        background-color: rgb(163, 55, 73);
+                        background-color: var(--vscode-button-hoverBackground);
                     }
-    
+
                     .container {
                         text-align: center;
                         width: 100%;
                         max-width: 400px;
                     }
-    
+
                     .input-container {
                         margin-bottom: 20px;
                     }
+
                 </style>
             </head>
             <body>
