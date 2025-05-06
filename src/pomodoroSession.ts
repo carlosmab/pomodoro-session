@@ -41,6 +41,10 @@ export class PomodoroSession {
         return `🍅 ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} - ${this.cycle[this.currentPhaseIndex].type.charAt(0).toUpperCase() + this.cycle[this.currentPhaseIndex].type.slice(1)}`;
     }
 
+    getCurrentCycle(): { type: 'working' | 'break' | 'longBreak'; duration: number; endMessage: string} {
+        return this.cycle[this.currentPhaseIndex];
+    }
+
     private runPhase(phase: { type: 'working' | 'break' | 'longBreak'; duration: number }) {
         this.isRunning = true;
         this.currentTime = phase.duration;

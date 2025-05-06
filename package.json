@@ -22,24 +22,24 @@
       }
     ],
     "configuration": {
-        "type": "object",
-        "properties": {
-            "pomodoro.workDuration": {
-                "type": "number",
-                "default": 25,
-                "description": "Work duration in minutes."
-            },
-            "pomodoro.shortBreakDuration": {
-                "type": "number",
-                "default": 5,
-                "description": "Short break duration in minutes."
-            },
-            "pomodoro.longBreakDuration": {
-                "type": "number",
-                "default": 15,
-                "description": "Long break duration in minutes."
-            }
+      "type": "object",
+      "properties": {
+        "pomodoro.workDuration": {
+          "type": "number",
+          "default": 25,
+          "description": "Work duration in minutes."
+        },
+        "pomodoro.shortBreakDuration": {
+          "type": "number",
+          "default": 5,
+          "description": "Short break duration in minutes."
+        },
+        "pomodoro.longBreakDuration": {
+          "type": "number",
+          "default": 15,
+          "description": "Long break duration in minutes."
         }
+      }
     }
   },
   "scripts": {
@@ -47,11 +47,16 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile",
-    "test": "node ./out/test/extension.test.js"
+    "test": "mocha --require ts-node/register test/**/*.test.ts"
   },
   "devDependencies": {
+    "@types/chai": "^5.2.2",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.15.3",
     "@types/vscode": "^1.99.1",
+    "chai": "^5.2.0",
+    "mocha": "^11.2.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "vscode": "^1.1.37",
     "vscode-test": "^1.6.1"
